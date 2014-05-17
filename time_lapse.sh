@@ -10,4 +10,4 @@ for j in $*; do
         # echo $j 1>&2
         cat $j
     }
-done | ffmpeg -y -f image2pipe -r 20 -vcodec mjpeg -i - -pix_fmt yuv420p -vcodec libx264 $output
+done | ffmpeg -y -f image2pipe -vcodec mjpeg -r 15 -i - -pix_fmt yuv420p -vcodec libx264 $output
