@@ -2,10 +2,6 @@
 
 cd $(dirname $0)
 
-the_year=$(date +%Y)
-the_month=$(date +%m)
-the_day=$(date +%d)
-
 d=$(date +"%Y-%m-%dT%H:%M:%S%z")
 zipurl="http://zipperdog.dyndns.org/NWS"
 
