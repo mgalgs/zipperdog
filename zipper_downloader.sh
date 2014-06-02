@@ -12,7 +12,7 @@ wget_opts="--quiet -O-"
 [[ $VERBOSE -eq 0 ]] || echo -n "Downloading images [$d]..."
 c1out=camera1/$(date +%Y)/$(date +%m)/$(date +%d)
 mkdir -p $c1out
-wget ${=wget_opts} $zipurl/hyrum_dam_w.jpg.jpg > $c1out/camera1_${d}.jpg
+wget ${=wget_opts} $zipurl/hyrum_dam_w.jpg > $c1out/camera1_${d}.jpg
 
 [[ $VERBOSE -eq 0 ]] || echo -n .
 c2out=camera2/$(date +%Y)/$(date +%m)/$(date +%d)
