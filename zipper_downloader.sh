@@ -7,7 +7,7 @@ VERBOSE=${VERBOSE:-0}
 d=$(date +"%Y-%m-%dT%H:%M:%S%z")
 zipurl="http://zipperdog.dyndns.org/Images"
 
-wget_opts="--quiet -O-"
+wget_opts="--quiet -t 2 --connect-timeout=10 -O-"
 
 [[ $VERBOSE -eq 0 ]] || echo -n "Downloading images [$d]..."
 c1out=camera1/$(date +%Y)/$(date +%m)/$(date +%d)
