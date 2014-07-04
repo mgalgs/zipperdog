@@ -51,7 +51,7 @@ ffmpeg_from_imgs()
 {
     filter="$1"
     vidname="$2"
-    ffmpeg -y -t 2 \
+    ffmpeg -y \
         -f image2pipe -vcodec mjpeg -r 15 -i <(cat ${cam1_imgs[@]}) \
         -f image2pipe -vcodec mjpeg -r 15 -i <(cat ${cam2_imgs[@]}) \
         -f image2pipe -vcodec mjpeg -r 15 -i <(cat ${cam3_imgs[@]}) \
