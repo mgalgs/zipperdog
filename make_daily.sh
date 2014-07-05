@@ -6,7 +6,7 @@ the_day=${the_day:-$(date +%d)}
 output=${output:-$the_year-$the_month-$the_day.mp4}
 do_cams=${do_cams:-1}
 do_3x1=${do_3x1:-1}
-# do_1top_2bottom=${do_1top_2bottom:-1}
+do_1top_2bottom=${do_1top_2bottom:-1}
 verbose=${verbose:-0}
 
 cd $(dirname $0)
@@ -61,7 +61,7 @@ ffmpeg_from_imgs()
 }
 
 filter_3x1="[1]pad=iw*3[left];[left][0]overlay=w[x];[x][2]overlay=w*2,scale=1920:-2"
-# filter_1top_2bottom="[0]pad=iw*2[left];[1]scale=-2:ih/2,pad=height=ih*2[small1];[2]scale=-2:ih/2,pad=height=ih*2:y=ih[small2];[small2][small1]overlay[smalls];[left][smalls]overlay=main_w,scale=1920:-2"
+filter_1top_2bottom="[1]scale=w=1920/2:h=-1, pad=w=1920:h=1080:y=1080/2 [left_bottom]; [2] scale=w=-1:h=1080/2 [right_bottom]; [left_bottom][right_bottom] overlay=x=1920/2:y=1080/2 [bottom]; [0] scale=w=-1:h=1080/2 [top_middle]; [bottom][top_middle] overlay=x=1920/4"
 
 [[ $do_3x1 -eq 1 ]] && ffmpeg_from_imgs $filter_3x1 damcamdaily-combined-3x1-$output
-# [[ $do_1top_2bottom -eq 1 ]] && ffmpeg_from_imgs $filter_1top_2bottom damcamdaily-combined-1top_2bottom-$output
+[[ $do_1top_2bottom -eq 1 ]] && ffmpeg_from_imgs $filter_1top_2bottom damcamdaily-combined-1top_2bottom-$output
