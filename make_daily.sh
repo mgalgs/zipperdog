@@ -8,8 +8,12 @@ do_cams=${do_cams:-1}
 do_3x1=${do_3x1:-1}
 do_1top_2bottom=${do_1top_2bottom:-1}
 verbose=${verbose:-0}
+do_upload=${do_upload:-y}
+venv=${venv:-~/virtualenvs/zipperdog/bin/activate}
 
 cd $(dirname $0)
+
+[[ $do_upload = y ]] && source $venv
 
 vlog()
 {
@@ -19,6 +23,15 @@ vlog()
 if [[ $do_cams -eq 1 ]]; then
     for cam in camera1 camera2 camera3; do
         ./time_lapse.sh $cam/dailies/damcamdaily-$cam-$output $(ls -1tr $cam/$the_year/$the_month/$the_day/*)
+        case $cam in;
+            camera1) readable="Camera 1" ;;
+            camera2) readable="Camera 2" ;;
+            camera3) readable="Camera 3" ;;
+        esac
+        [[ $do_upload = y ]] && ./upload_video.py \
+            --file $cam/dailies/damcamdaily-$cam-$output \
+            --title "Hyrum Dam Cam $the_year-$the_month-$the_day $readable" \
+            --noauth_local_webserver
     done
 fi
 
@@ -76,3 +89,7 @@ filter_1top_2bottom="[3] scale=h=1080:w=-1, pad=w=1920:h=1080, trim=end=4, drawt
 [[ $do_3x1 -eq 1 ]] && ffmpeg_from_imgs $filter_3x1 combined_dailies/damcamdaily-combined-3x1-$output
 [[ $do_1top_2bottom -eq 1 ]] && ffmpeg_from_imgs $filter_1top_2bottom combined_dailies/damcamdaily-combined-1top_2bottom-$output
 
+[[ $do_upload = y ]] && ./upload_video.py \
+    --file combined_dailies/damcamdaily-combined-1top_2bottom-$output \
+    --title "Hyrum Dam Cam $the_year-$the_month-$the_day All Cameras" \
+    --noauth_local_webserver
