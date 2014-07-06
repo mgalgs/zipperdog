@@ -5,7 +5,7 @@ the_month=${the_month:-$(date +%m)}
 the_day=${the_day:-$(date +%d)}
 output=${output:-$the_year-$the_month-$the_day.mp4}
 do_cams=${do_cams:-1}
-do_3x1=${do_3x1:-1}
+# do_3x1=${do_3x1:-1}
 do_1top_2bottom=${do_1top_2bottom:-1}
 verbose=${verbose:-0}
 do_upload=${do_upload:-y}
@@ -74,7 +74,7 @@ ffmpeg_from_imgs()
         $vidname
 }
 
-filter_3x1="[1]pad=iw*3[left];[left][0]overlay=w[x];[x][2]overlay=w*2,scale=1920:-2"
+# filter_3x1="[1]pad=iw*3[left];[left][0]overlay=w[x];[x][2]overlay=w*2,scale=1920:-2"
 # all even:
 # filter_1top_2bottom="[1]scale=w=1920/2:h=-1, pad=w=1920:h=1080:y=1080/2 [left_bottom]; [2] scale=w=-1:h=1080/2 [right_bottom]; [left_bottom][right_bottom] overlay=x=1920/2:y=1080/2 [bottom]; [0] scale=w=-1:h=1080/2 [top_middle]; [bottom][top_middle] overlay=x=1920/4"
 
@@ -86,7 +86,7 @@ font="Satisfy-Regular.ttf"
 filter_1top_2bottom="[3] scale=h=1080:w=-1, pad=w=1920:h=1080, trim=end=4, drawtext=fontfile=${font}: fontsize=150: x=(w/2)-(tw/2): y=${rollin}: text=HyrumDamCam.com, setsar=sar=1/1, fade=type=out:start_time=3:duration=1 [title]; [1]scale=w=-1:h=440, pad=w=1920:h=1080:x=178:y=640 [left_bottom]; [2] scale=w=-1:h=440 [right_bottom]; [left_bottom][right_bottom] overlay=x=960:y=640 [bottom]; [0] scale=w=-1:h=640 [top_middle]; [bottom][top_middle] overlay=x=391, setsar=sar=1/1, fade=duration=0.25 [main]; [title][main] concat=n=2, trim=end=6"
 
 
-[[ $do_3x1 -eq 1 ]] && ffmpeg_from_imgs $filter_3x1 combined_dailies/damcamdaily-combined-3x1-$output
+# [[ $do_3x1 -eq 1 ]] && ffmpeg_from_imgs $filter_3x1 combined_dailies/damcamdaily-combined-3x1-$output
 [[ $do_1top_2bottom -eq 1 ]] && ffmpeg_from_imgs $filter_1top_2bottom combined_dailies/damcamdaily-combined-1top_2bottom-$output
 
 [[ $do_upload = y ]] && ./upload_video.py \
