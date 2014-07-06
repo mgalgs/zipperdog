@@ -61,7 +61,11 @@ ffmpeg_from_imgs()
 }
 
 filter_3x1="[1]pad=iw*3[left];[left][0]overlay=w[x];[x][2]overlay=w*2,scale=1920:-2"
-filter_1top_2bottom="[1]scale=w=1920/2:h=-1, pad=w=1920:h=1080:y=1080/2 [left_bottom]; [2] scale=w=-1:h=1080/2 [right_bottom]; [left_bottom][right_bottom] overlay=x=1920/2:y=1080/2 [bottom]; [0] scale=w=-1:h=1080/2 [top_middle]; [bottom][top_middle] overlay=x=1920/4"
+# all even:
+# filter_1top_2bottom="[1]scale=w=1920/2:h=-1, pad=w=1920:h=1080:y=1080/2 [left_bottom]; [2] scale=w=-1:h=1080/2 [right_bottom]; [left_bottom][right_bottom] overlay=x=1920/2:y=1080/2 [bottom]; [0] scale=w=-1:h=1080/2 [top_middle]; [bottom][top_middle] overlay=x=1920/4"
+# bottoms small:
+filter_1top_2bottom="[1]scale=w=-1:h=440, pad=w=1920:h=1080:x=178:y=640 [left_bottom]; [2] scale=w=-1:h=440 [right_bottom]; [left_bottom][right_bottom] overlay=x=960:y=640 [bottom]; [0] scale=w=-1:h=640 [top_middle]; [bottom][top_middle] overlay=x=391"
+# trim=end=1
 
 [[ $do_3x1 -eq 1 ]] && ffmpeg_from_imgs $filter_3x1 damcamdaily-combined-3x1-$output
 [[ $do_1top_2bottom -eq 1 ]] && ffmpeg_from_imgs $filter_1top_2bottom damcamdaily-combined-1top_2bottom-$output
