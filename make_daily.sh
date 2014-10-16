@@ -31,6 +31,7 @@ if [[ $do_cams -eq 1 ]]; then
         [[ $do_upload = y ]] && ./upload_video.py \
             --file $cam/dailies/damcamdaily-$cam-$output \
             --title "Hyrum Dam Cam $the_year-$the_month-$the_day $readable" \
+            --description "Visit http://www.hyrumdamcam.com for more info" \
             --noauth_local_webserver
     done
 fi
@@ -92,4 +93,5 @@ filter_1top_2bottom="[3] scale=h=1080:w=-1, pad=w=1920:h=1080, trim=end=4, drawt
 [[ $do_upload = y ]] && ./upload_video.py \
     --file combined_dailies/damcamdaily-combined-1top_2bottom-$output \
     --title "Hyrum Dam Cam $the_year-$the_month-$the_day All Cameras" \
+    --description "Visit http://www.hyrumdamcam.com for more info" \
     --noauth_local_webserver
