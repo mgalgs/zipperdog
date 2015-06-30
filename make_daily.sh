@@ -22,7 +22,7 @@ vlog()
 }
 
 if [[ $do_cams -eq 1 ]]; then
-    for cam in camera1 camera2 camera3; do
+    for cam in camera1 camera2 camera3 camera4 camera5; do
         ./time_lapse.sh $cam/dailies/damcamdaily-$cam-$output $(ls -1tr $cam/$the_year/$the_month/$the_day/*)
         case $cam in;
             camera1) readable="Camera 1" ;;
@@ -44,6 +44,8 @@ vlog -n "Building image lists $iter"
 cam1_imgs=()
 cam2_imgs=()
 cam3_imgs=()
+cam4_imgs=()
+cam5_imgs=()
 for img in $(ls -1tr camera1/$the_year/$the_month/$the_day/*); do
     case $iter in;
         "/") iter="-"; ;;
@@ -54,8 +56,8 @@ for img in $(ls -1tr camera1/$the_year/$the_month/$the_day/*); do
     vlog -n "\b$iter"
     cam2_img=camera2/$the_year/$the_month/$the_day/camera2_${${img##*/}##*_}
     cam3_img=camera3/$the_year/$the_month/$the_day/camera3_${${img##*/}##*_}
-    cam4_img=camera3/$the_year/$the_month/$the_day/camera4_${${img##*/}##*_}
-    cam5_img=camera3/$the_year/$the_month/$the_day/camera5_${${img##*/}##*_}
+    cam4_img=camera4/$the_year/$the_month/$the_day/camera4_${${img##*/}##*_}
+    cam5_img=camera5/$the_year/$the_month/$the_day/camera5_${${img##*/}##*_}
     if [[ $(du $img | awk '{print $1}') -gt 0 && \
         $({ du $cam2_img 2>/dev/null || echo 0; } | awk '{print $1}') -gt 0 && \
         $({ du $cam3_img 2>/dev/null || echo 0; } | awk '{print $1}') -gt 0 && \
@@ -84,6 +86,8 @@ ffmpeg_from_imgs()
         -filter_complex $filter \
         -vcodec libx264 \
         $vidname
+
+        # -loop 1 -i ellipse-mask.png \
 }
 
 # filter_3x1="[1]pad=iw*3[left];[left][0]overlay=w[x];[x][2]overlay=w*2,scale=1920:-2"
@@ -95,18 +99,37 @@ ffmpeg_from_imgs()
 rollin="(h/2)-(500*((1/5)^t))"
 # font="Sail-Regular.ttf"
 font="Satisfy-Regular.ttf"
-filter_1top_2bottom="[5] scale=h=1080:w=-1, pad=w=1920:h=1080, trim=end=4, drawtext=fontfile=${font}: fontsize=150: x=(w/2)-(tw/2): y=${rollin}: text=HyrumDamCam.com, setsar=sar=1/1, fade=type=out:start_time=3:duration=1 [title]; [1]scale=w=-1:h=440, pad=w=1920:h=1080:x=178:y=640 [left_bottom]; [2] scale=w=-1:h=440 [right_bottom]; [left_bottom][right_bottom] overlay=x=960:y=640 [bottom]; [0] scale=w=-1:h=640 [top_middle]; [bottom][top_middle] overlay=x=391, setsar=sar=1/1, fade=duration=0.25 [main]; [title][main] concat=n=2"
+
+filter_1top_2bottom="\
+[5] scale=h=1080:w=-1, pad=w=1920:h=1080, trim=end=4, drawtext=fontfile=${font}: fontsize=150: x=(w/2)-(tw/2): y=${rollin}: text=HyrumDamCam.com, setsar=sar=1/1, fade=type=out:start_time=3:duration=1 [title]; \
+[1] scale=w=-1:h=440, pad=w=1920:h=1080:x=178:y=640 [left_bottom]; \
+[2] scale=w=-1:h=440 [right_bottom]; \
+[left_bottom][right_bottom] overlay=x=960:y=640 [bottom]; \
+[0] scale=w=-1:h=640 [top_middle]; \
+[bottom][top_middle] overlay=x=391, setsar=sar=1/1, fade=duration=0.25 [main]; \
+[title][main] concat=n=2"
+
+divisor=3
+tinyheight=$(bc <<<"1080 / $divisor")
+tinywidth=$(bc <<<"1920 / $divisor")
+padding=25
 filter_4around_1center="\
 [5] scale=h=1080:w=-1, pad=w=1920:h=1080, trim=end=4, drawtext=fontfile=${font}: fontsize=150: x=(w/2)-(tw/2): y=${rollin}: text=HyrumDamCam.com, setsar=sar=1/1, fade=type=out:start_time=3:duration=1 [title];
-[0] scale=w=iw/2:h=-1, pad=w=1920:h=1080:x=0:y=0 [top_left];
-[1] scale=w=iw/2:h=-1, pad=w=1920:h=1080:x=iw/2:y=0 [top_right];
-[2] scale=w=iw/2:h=-1, pad=w=1920:h=1080:x=0:y=iw/2 [bottom_left];
-[3] scale=w=iw/2:h=-1, pad=w=1920:h=1080:x=iw/2:y=iw/2 [bottom_right]; // <<< Start here!
-[4] scale=w=-1:h=440 [middle];
-[left_bottom][right_bottom] overlay=x=960:y=640 [bottom];
-[0] scale=w=-1:h=1080 [middle];
-[bottom][top_middle] overlay=x=391, setsar=sar=1/1, fade=duration=0.25 [main];
+[1] scale=h=$tinyheight:w=-1, fade=alpha=1:type=out:start_time=4:duration=4 [top_left];
+[2] scale=h=$tinyheight:w=-1, fade=alpha=1:type=out:start_time=4:duration=4 [top_right];
+[3] scale=h=$tinyheight:w=-1, fade=alpha=1:type=out:start_time=4:duration=4 [bottom_left];
+[4] scale=h=$tinyheight:w=-1, fade=alpha=1:type=out:start_time=4:duration=4 [bottom_right];
+[0] scale=h=1080:w=-1 [biggie];
+[biggie][top_left] overlay=x=${padding}:y=${padding} [b1];
+[b1][top_right] overlay=x=main_w-${tinywidth}-${padding}:y=${padding} [b2];
+[b2][bottom_left] overlay=x=${padding}:y=main_h-${tinyheight}-${padding} [b3];
+[b3][bottom_right] overlay=x=main_w-${tinywidth}-${padding}:y=main_h-${tinyheight}-${padding} [b4];
+[b4] fade=duration=0.25 [main];
 [title][main] concat=n=2"
+
+# [6] alphaextract, scale=h=1080/2:w=-1 [alf];
+# [middle_scaled][alf] alphamerge [middle];
+# [0] scale=h=1080/2:w=-1 [middle_scaled];
 
 
 # [[ $do_3x1 -eq 1 ]] && ffmpeg_from_imgs $filter_3x1 combined_dailies/damcamdaily-combined-3x1-$output
