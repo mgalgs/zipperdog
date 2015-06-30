@@ -4,6 +4,7 @@ output=$1
 shift
 
 echo "Saving time lapse to $output"
+mkdir -p $(dirname $output)
 
 for j in $*; do
     [[ $(du $j | awk '{print $1}')  -eq 0 ]] || {
