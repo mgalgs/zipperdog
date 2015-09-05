@@ -11,6 +11,7 @@ do_4around_1center=${do_4around_1center:-1}
 verbose=${verbose:-0}
 do_upload=${do_upload:-y}
 venv=${venv:-~/virtualenvs/zipperdog/bin/activate}
+do_cams_upload=${do_cams_upload:-n}
 
 cd $(dirname $0)
 
@@ -31,7 +32,7 @@ if [[ $do_cams -eq 1 ]]; then
             camera4) readable="Camera 4" ;;
             camera5) readable="Camera 5" ;;
         esac
-        [[ $do_upload = y ]] && ./upload_video.py \
+        [[ $do_cams_upload = y ]] && ./upload_video.py \
             --file $cam/dailies/damcamdaily-$cam-$output \
             --title "Hyrum Dam Cam $the_year-$the_month-$the_day $readable" \
             --description "Visit http://www.hyrumdamcam.com for more info" \
