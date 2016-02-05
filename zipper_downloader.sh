@@ -10,7 +10,7 @@ say()
 }
 
 d=$(date +"%Y-%m-%dT%H:%M:%S%z")
-zipurl="http://zipperdog.dyndns.org/Images"
+zipurl="http://www.hyrumdamcam.com/Images"
 
 wget_opts="--quiet -t 2 --connect-timeout=10 -O-"
 
